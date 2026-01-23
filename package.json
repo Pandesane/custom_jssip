@@ -1,0 +1,34 @@
+{
+  "name": "custom_jssip",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "main": "./dist/jssip.umd.cjs",
+  "module": "./dist/jssip.js",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/types/jssip.d.ts",
+      "import": "./dist/jssip.js",
+      "require": "./dist/jssip.umd.cjs"
+    },
+    "./player": {
+      "types": "./dist/types/player.d.ts",
+      "import": "./dist/player.js",
+      "require": "./dist/player.umd.cjs"
+    }
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "typescript": "~5.9.3",
+    "vite": "^7.2.4",
+    "vite-plugin-dts": "^4.5.4"
+  },
+  "peerDependencies": {}
+}
