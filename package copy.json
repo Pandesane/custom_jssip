@@ -13,6 +13,11 @@
       "types": "./dist/types/jssip.d.ts",
       "import": "./dist/jssip.js",
       "require": "./dist/jssip.umd.cjs"
+    },
+    "./player": {
+      "types": "./dist/types/player.d.ts",
+      "import": "./dist/player.js",
+      "require": "./dist/player.umd.cjs"
     }
   },
   "scripts": {
