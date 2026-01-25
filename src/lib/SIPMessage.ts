@@ -50,7 +50,10 @@ export class OutgoingRequest {
       throw Error("method, ruri, ua must be provided")
     }
 
+
+
     params = params || {};
+    let ACK_TO: boolean = params["ack_to"] || false;
 
     this.ua = ua;
     this.headers = {};
@@ -86,7 +89,18 @@ export class OutgoingRequest {
     const to_display_name = typeof params.to_display_name !== 'undefined' ? params.to_display_name : null;
 
     this.to = new NameAddrHeader(to_uri, to_display_name, to_params!);
-    this.setHeader('to', this.to.toString());
+
+
+    let headerTo =  ACK_TO ? this.ua.ACK_TO : this.to.toString()
+    // if (this.ua.ACT_TO == true) {
+    //   console.log("Finished resetting to header: ")
+
+    // } else {
+
+    // }
+    this.setHeader('to', headerTo);
+    console.log("Setting to header too", headerTo, this.ua.ACK_TO, this.headers)
+
 
     // From.
     const from_uri = params.from_uri || ua.configuration.uri;

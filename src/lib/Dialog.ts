@@ -61,6 +61,14 @@ export class Dialog {
       throw Error('unable to create a Dialog without Contact header field')
     }
 
+    // if (!message.hasHeader('contact')) {
+    //   // @ts-ignore
+    //   return {
+    //     // @ts-ignore
+    //     error: 'unable to create a Dialog without Contact header field'
+    //   };
+    // }
+
     if (message instanceof SIPMessage.IncomingResponse) {
       state = (message.status_code < 200) ? C.STATUS_EARLY : C.STATUS_CONFIRMED;
     }
@@ -160,10 +168,19 @@ export class Dialog {
   }
 
   sendRequest(method: any, options: any = {}) {
+    console.log("Sending Request from dialog ", this._ua.ACK_TO)
     const extraHeaders = Utils.cloneArray(options.extraHeaders);
     const eventHandlers = Utils.cloneObject(options.eventHandlers);
     const body = options.body || null;
-    const request = this._createRequest(method, extraHeaders, body);
+    let request: any;
+    // if (this._ua.ACK_TO) {
+    //   request = this._createRequest(method, extraHeaders, body);
+
+    // }
+    // else {
+
+    // }
+    request = this._createRequest(method, extraHeaders, body);
 
     // Increase the local CSeq on authentication.
     eventHandlers.onAuthenticated = () => {
@@ -207,10 +224,13 @@ export class Dialog {
       this._ack_seqnum :
       this._local_seqnum += 1;
 
+    let ACK_TO = method == JsSIP_C.ACK ? true : false
+
     const request = new SIPMessage.OutgoingRequest(
       method,
       this._remote_target,
       this._ua, {
+      "ack_to": ACK_TO,
       'cseq': cseq,
       'call_id': this._id.call_id,
       'from_uri': this._local_uri,

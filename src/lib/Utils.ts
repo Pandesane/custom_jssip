@@ -1,4 +1,4 @@
-import * as JsSIP_C from "./Constants";
+import * as JsSIP_C from "./Constants.js";
 import * as Grammar from "./Grammar.js"
 import { URI } from "./URI.js";
 

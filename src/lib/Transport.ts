@@ -56,6 +56,7 @@ export class Transport {
   ondisconnect: any
   onconnect: any
   newCustomData: any
+  sendCount = 0
 
   close_requested = false;
   constructor(sockets: any, recovery_options: any = C.recovery_options) {
@@ -192,6 +193,9 @@ export class Transport {
 
   send(data: any) {
     logger.debug("send()");
+    console.log("Transport send count: ", this.sendCount)
+    this.sendCount++
+
 
     if (!this.isConnected()) {
       logger.warn("unable to send message, transport is not connected");

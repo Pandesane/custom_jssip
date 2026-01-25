@@ -40,6 +40,7 @@ export class NonInviteClientTransaction extends EventEmitter {
   state: any
   F: any
   K: any
+  name = "NonInviteClientTransaction "
   constructor(ua: any, transport: any, request: any, eventHandlers: any) {
     super();
 
@@ -144,6 +145,10 @@ export class InviteClientTransaction extends EventEmitter {
   B: any
   D: any
   M: any
+  count = 1
+  name = "InviteClientTransaction"
+  sendCount = 1
+
   constructor(ua: any, transport: any, request: any, eventHandlers: any) {
     super();
 
@@ -174,6 +179,8 @@ export class InviteClientTransaction extends EventEmitter {
   }
 
   send() {
+    console.log("InviteClientTransaction send count: ", this.sendCount)
+    this.sendCount++
     this.stateChanged(C.STATUS_CALLING);
     this.B = setTimeout(() => {
       this.timer_B();
@@ -269,7 +276,8 @@ export class InviteClientTransaction extends EventEmitter {
 
   receiveResponse(response: any) {
     const status_code = response.status_code;
-
+    console.log("receiving response from InviteClientTransaction", this.count, this.state, status_code, response)
+    this.count++;
     if (status_code >= 100 && status_code <= 199) {
       switch (this.state) {
         case C.STATUS_CALLING:
@@ -317,6 +325,8 @@ export class AckClientTransaction extends EventEmitter {
   transport: any;
   request: any;
   eventHandlers: any;
+  name = "AckClientTransaction"
+  sendCount = 0
 
   constructor(ua: any, transport: any, request: any, eventHandlers: any) {
     super();
@@ -338,6 +348,10 @@ export class AckClientTransaction extends EventEmitter {
   }
 
   send() {
+    this.sendCount++
+    console.log("AckInviteClient  send count: ", this.sendCount)
+
+    console.log("Sending AckInviteClient Transaction")
     if (!this.transport.send(this.request)) {
       this.onTransportError();
     }
@@ -469,6 +483,9 @@ export class InviteServerTransaction extends EventEmitter {
   L: any
   H: any
   I: any
+  count = 1
+  name = "InviteServerTransaction"
+
   constructor(ua: any, transport: any, request: any) {
     super();
 
@@ -552,6 +569,8 @@ export class InviteServerTransaction extends EventEmitter {
 
   // INVITE Server Transaction RFC 3261 17.2.1.
   receiveResponse(status_code: any, response: any, onSuccess: any, onFailure: any) {
+    console.log("receiving response from InviteServerTransaction", this.count, this.state, status_code, response)
+    this.count++;
     if (status_code >= 100 && status_code <= 199) {
       switch (this.state) {
         case C.STATUS_PROCEEDING:

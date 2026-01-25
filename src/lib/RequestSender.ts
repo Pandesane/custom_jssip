@@ -53,6 +53,7 @@ export class RequestSender {
   * Create the client transaction and send the message.
   */
   send() {
+    // console.log
     const eventHandlers = {
       onRequestTimeout: () => { this._eventHandlers.onRequestTimeout(); },
       onTransportError: () => { this._eventHandlers.onTransportError(); },
@@ -61,14 +62,19 @@ export class RequestSender {
 
     switch (this._method) {
       case 'INVITE':
+        console.log("Request for method INVITE: ", this._request)
+
         this.clientTransaction = new Transactions.InviteClientTransaction(
           this._ua, this._ua.transport, this._request, eventHandlers);
         break;
       case 'ACK':
+        console.log("Request for method ACK: ", this._request)
         this.clientTransaction = new Transactions.AckClientTransaction(
           this._ua, this._ua.transport, this._request, eventHandlers);
         break;
       default:
+        console.log("Request for method Default: ", this._request)
+
         this.clientTransaction = new Transactions.NonInviteClientTransaction(
           this._ua, this._ua.transport, this._request, eventHandlers);
     }
@@ -85,6 +91,7 @@ export class RequestSender {
   * Authenticate request if needed or pass the response back to the applicant.
   */
   _receiveResponse(response: any) {
+    console.log("Running from request senders receiveResponse")
     let challenge;
     let authorization_header_name;
     const status_code = response.status_code;

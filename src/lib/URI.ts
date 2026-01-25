@@ -1,6 +1,6 @@
-import * as JsSIP_C from "./Constants"
+import * as JsSIP_C from "./Constants.js"
 import * as Grammar from "./Grammar.js";
-import * as Utils from "./Utils"
+import * as Utils from "./Utils.js"
 
 
 export type URIScheme = 'sip' | string;

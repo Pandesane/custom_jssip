@@ -231,6 +231,7 @@ export class UA extends EventEmitter {
   _closeTimer: any;
   // Initialize registrator.
   _registrator: Registrator;
+  ACK_TO: string = ""
 
   constructor(configuration: any) {
     // Check configuration argument.
@@ -712,6 +713,7 @@ export class UA extends EventEmitter {
    */
   receiveRequest(request: any) {
     const method = request.method;
+    console.log("Receiver Request from UA of method: ", method)
 
     // Check that request URI points to us.
     if (
@@ -972,11 +974,11 @@ export class UA extends EventEmitter {
       this._transport.ondisconnect = onTransportDisconnect.bind(this);
       // this._transport.ondata = onTransportData.bind(this);
       // let that = this;
-      this._transport.ondata = (data: any) => {
-        console.log("Custom Logger: 4", data);
-      };
+      // this._transport.ondata = (data: any) => {
+      //   console.log("Custom Logger: 4", data);
+      // };
       this._transport.newCustomData = (data: any) => {
-        // console.log("Custom Logger: 4", data)
+        // console.log("new Custom Logger: 4", data)
         onTransportData(data, this);
       };
     } catch (e) {
@@ -1062,6 +1064,9 @@ export class UA extends EventEmitter {
       "display_name",
       "register",
       "extra_headers",
+      "To",
+      "to",
+      
     ];
 
     for (const parameter in this._configuration) {
@@ -1187,28 +1192,34 @@ function onTransportDisconnect(data: any) {
 // Transport data event.
 function onTransportData(data: any, ua: any) {
   // this = ua
+  // console.log("UA Dialogs onTransportData", ua._dialogs)
   const transport = data.transport;
   let message = data.message;
-  console.log("Custom: Logger 2", message);
 
 
   message = Parser.parseMessage(message, ua);
 
   if (!message) {
+
+    console.log("Failed no return message")
     return;
   }
 
+  console.log("Custom: Logger 2", message);
 
   if (
     ua._status === C.STATUS_USER_CLOSED &&
     message instanceof SIPMessage.IncomingRequest
   ) {
+    console.log("Failed Status user closed")
+
     return;
   }
 
   // Do some sanity check.
   if (!sanityCheck(message, ua, transport)) {
-    return;
+    console.log("Failed sanity check")
+    // return;
   }
 
   if (message instanceof SIPMessage.IncomingRequest) {
@@ -1226,6 +1237,7 @@ function onTransportData(data: any, ua: any) {
       case JsSIP_C.INVITE:
         transaction = ua._transactions.ict[message.via_branch];
         if (transaction) {
+          console.log("Current Transaction Info", transaction.name, transaction)
           transaction.receiveResponse(message);
         }
         break;
@@ -1235,6 +1247,9 @@ function onTransportData(data: any, ua: any) {
       default:
         transaction = ua._transactions.nict[message.via_branch];
         if (transaction) {
+          console.log("Current Transaction Info", transaction.name, transaction)
+          // console.log("Transaction response success: Receive response Default")
+
           transaction.receiveResponse(message);
         }
         break;

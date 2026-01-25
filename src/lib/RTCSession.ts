@@ -668,6 +668,8 @@ export class RTCSession extends EventEmitter {
     }
 
     this._newRTCSession('local', this._request);
+    console.log(" Currently created Dialog", this._dialog)
+
 
     this._sendInitialRequest(mediaConstraints, rtcOfferConstraints, mediaStream);
   }
@@ -709,6 +711,7 @@ export class RTCSession extends EventEmitter {
 
       return;
     }
+
 
     if (request.body) {
       this._late_sdp = false;
@@ -1563,7 +1566,9 @@ export class RTCSession extends EventEmitter {
     logger.debug('sendRequest()');
 
     if (this._dialog) {
-      return this._dialog.sendRequest(method, options);
+      console.log("These are the options for sendRequest from RTCSession", method, options)
+      return this._dialog.sendRequest(method, options
+      );
     }
     else {
       const dialogsArray: any = Object.values(this._earlyDialogs);
@@ -2607,6 +2612,7 @@ export class RTCSession extends EventEmitter {
       },
       onReceiveResponse: (response: any) => {
         this._receiveInviteResponse(response);
+        // console.log("Custom response pande", response)
       }
     });
 
@@ -2711,16 +2717,19 @@ export class RTCSession extends EventEmitter {
   _receiveInviteResponse(response: any) {
     logger.debug('receiveInviteResponse()');
 
+
     // Handle 2XX retransmissions and responses from forked requests.
     if (this._dialog && (response.status_code >= 200 && response.status_code <= 299)) {
 
       /*
-       * If it is a retransmission from the endpoint that established
-       * the dialog, send an ACK
-       */
-      if (this._dialog.id.call_id === response.call_id &&
-        this._dialog.id.local_tag === response.from_tag &&
-        this._dialog.id.remote_tag === response.to_tag) {
+      * If it is a retransmission from the endpoint that established
+      * the dialog, send an ACK
+      */
+      // this._dialog._id.local_tag === response.from_tag &&
+      // this._dialog._id.remote_tag === response.to_tag
+      if (this._dialog._id.call_id == response.call_id
+      ) {
+        console.log("Reinvite is going on B4 switch", response, this._dialog)
         this.sendRequest(JsSIP_C.ACK);
 
         return;
@@ -2763,6 +2772,7 @@ export class RTCSession extends EventEmitter {
       return;
     }
 
+
     switch (true) {
       case /^100$/.test(response.status_code):
         this._status = C.STATUS_1XX_RECEIVED;
@@ -2770,6 +2780,8 @@ export class RTCSession extends EventEmitter {
 
       case /^1[0-9]{2}$/.test(response.status_code):
         {
+          console.log("ReceiveInviteResponse is going on 100", response, this._dialog)
+
           // Do nothing with 1xx responses without To tag.
           if (!response.to_tag) {
             logger.debug('1xx response received without to tag');
@@ -2811,6 +2823,8 @@ export class RTCSession extends EventEmitter {
 
       case /^2[0-9]{2}$/.test(response.status_code):
         {
+          console.log("Reinvite is going on 200", response, this._dialog)
+
           this._status = C.STATUS_CONFIRMED;
 
           if (!response.body) {
@@ -2823,6 +2837,8 @@ export class RTCSession extends EventEmitter {
           if (!this._createDialog(response, 'UAC')) {
             break;
           }
+          console.log("Reinvite is going on 1", response, this._dialog)
+
 
           const e = { originator: 'remote', type: 'answer', sdp: response.body };
 
@@ -2833,9 +2849,12 @@ export class RTCSession extends EventEmitter {
 
           this._connectionPromiseQueue = this._connectionPromiseQueue
             .then(() => {
+              console.log("Reinvite is going on 2", response, this._dialog)
+
               // Be ready for 200 with SDP after a 180/183 with SDP.
               // We created a SDP 'answer' for it, so check the current signaling state.
               if (this._connection.signalingState === 'stable') {
+
                 return this._connection.createOffer(this._rtcOfferConstraints)
                   .then((offer: any) => this._connection.setLocalDescription(offer))
                   .catch((error: any) => {
@@ -2845,11 +2864,14 @@ export class RTCSession extends EventEmitter {
               }
             })
             .then(() => {
+              console.log("Reinvite is going on 3",  this._dialog)
               this._connection.setRemoteDescription(answer)
                 .then(() => {
                   // Handle Session Timers.
                   this._handleSessionTimersInIncomingResponse(response);
+                  // TODO: Set this to actually real value
 
+                  this._ua.ACK_TO = response.headers.To[0].raw
                   this._accepted('remote', response);
                   this.sendRequest(JsSIP_C.ACK);
                   this._confirmed('local', null);
@@ -2868,6 +2890,8 @@ export class RTCSession extends EventEmitter {
 
       default:
         {
+          console.log("Reinvite is going on 4", response, this._dialog)
+
           const cause = Utils.sipErrorCause(response.status_code);
 
           this._failed('remote', response, cause);

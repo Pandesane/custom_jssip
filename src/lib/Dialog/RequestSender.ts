@@ -12,7 +12,9 @@ import { RequestSender } from "../RequestSender"
 const EventHandlers: any = {
   onRequestTimeout: () => { },
   onTransportError: () => { },
-  onSuccessResponse: () => { },
+  onSuccessResponse: () => {
+    console.log("Success Event handler outside the DIalogRequest")
+   },
   onErrorResponse: () => { },
   onAuthenticated: () => { },
   onDialogError: () => { }
@@ -57,12 +59,15 @@ export class DialogRequestSender {
         this._eventHandlers.onRequestTimeout();
       },
       onTransportError: () => {
+
         this._eventHandlers.onTransportError();
       },
       onAuthenticated: (request: any) => {
+
         this._eventHandlers.onAuthenticated(request);
       },
       onReceiveResponse: (response: any) => {
+        // console.log("Receive handle for responses aKc 1", response)
         this._receiveResponse(response);
       }
     });
