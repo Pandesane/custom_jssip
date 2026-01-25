@@ -25,5 +25,13 @@
     "vite": "^7.2.4",
     "vite-plugin-dts": "^4.5.4"
   },
-  "peerDependencies": {}
+  "peerDependencies": {},
+  "dependencies": {
+    "@types/debug": "^4.1.7",
+    "@types/events": "^3.0.3",
+    "@types/sdp-transform": "^2.15.0",
+    "debug": "^4.3.1",
+    "events": "^3.3.0",
+    "sdp-transform": "^3.0.0"
+  }
 }
